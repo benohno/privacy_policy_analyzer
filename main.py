@@ -50,8 +50,13 @@ st.write('The url input is: ', privacy_policy_url)
 
 # st.write('Full Privacy Policy:', privacy_policy_str)
 
-reading_score = readability_score(privacy_policy_str)
-word_total = word_count(privacy_policy_str)
+if privacy_policy_url == '':
+    reading_score = 'NA'
+    word_total = 'NA'
+
+else:
+    reading_score = readability_score(privacy_policy_str)
+    word_total = word_count(privacy_policy_str)
 
 col1, col2, col3 = st.columns(3)
 col1.metric("Reading Grade Level", reading_score)
