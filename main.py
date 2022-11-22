@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+from web_scraper import scrape_privacy_policy_url
+from policy_scores import readability_score, word_count
 
 st.set_page_config(
     page_title="Privacy Policy Analyzer",
@@ -42,11 +44,18 @@ st.markdown("## **📌 Paste Privacy Policy URL **")
 
 privacy_policy_url = st.text_input("Here:")
 
+privacy_policy_str = scrape_privacy_policy_url(privacy_policy_url)
+
 st.write('The url input is: ', privacy_policy_url)
 
+# st.write('Full Privacy Policy:', privacy_policy_str)
+
+reading_score = readability_score(privacy_policy_str)
+word_total = word_count(privacy_policy_str)
+
 col1, col2, col3 = st.columns(3)
-col1.metric("Reading complexity", "70 °F", "1.2 °F")
-col2.metric("Total Length", "9", "-8% to average")
+col1.metric("Reading Grade Level", reading_score)
+col2.metric("Total Length", word_total)
 col3.metric("Place Holder metric", "22", "4%")
 
 
