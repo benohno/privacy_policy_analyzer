@@ -19,18 +19,18 @@ os.chdir("../../data/proc_tmp")
 extension = 'csv'
 all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
 
-# combine all files in the list
+# combine all files in the list into a single csv dataset that can be split later
 combined_csv = pd.concat([pd.read_csv(f, header=None) for f in all_filenames])
+# select relevant columns then rename them
 combined_csv = combined_csv[[2, 3, 4]]
 combined_csv.columns = ['text', 'outcome', 'source']
 combined_csv = combined_csv[combined_csv['text'] != '1'].reset_index(drop=True)
 combined_csv = combined_csv.sort_values(by=['outcome', 'source', 'text']).reset_index(drop=True)
-classes = combined_csv['outcome'].unique()
 
 # get the distinct classes
 # for each class, create a file with that line of text and name it as the original file name, f
-
-# export to file
+# then export to file
+classes = combined_csv['outcome'].unique()
 os.makedirs('../train', exist_ok=True)
 # combined_csv.to_csv(f'../train/train_data.csv', index=False)
 for c in classes:
@@ -42,11 +42,3 @@ for c in classes:
         filename = '../train/{}/{}-{}.txt'.format(c, source, index)
         with open(filename, 'w+') as f:
             f.write(data['text'])
-
-# print(combined_csv.columns)
-# print(classes)
-# print(os.getcwd())
-# print(combined_csv)
-# print(combined_csv.groupby(combined_csv.columns.tolist(), as_index=False).size())
-
-
