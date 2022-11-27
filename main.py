@@ -8,24 +8,7 @@ st.set_page_config(
     page_icon="🎈",
 )
 
-
-# def _max_width_():
-#     max_width_str = f"max-width: 1400px;"
-#     st.markdown(
-#         f"""
-#     <style>
-#     .reportview-container .main .block-container{{
-#         {max_width_str}
-#     }}
-#     </style>
-#     """,
-#         unsafe_allow_html=True,
-#     )
-
-
-# _max_width_()
-
-
+# title and introductory text
 st.title('Privacy Policy Analyzer')
 
 with st.expander("ℹ️ - About this app", expanded=True):
@@ -39,17 +22,17 @@ with st.expander("ℹ️ - About this app", expanded=True):
 
     st.markdown("")
 
-st.markdown("")
+# user inputs
 st.markdown("## **📌 Paste Privacy Policy URL **")
 
 privacy_policy_url = st.text_input("Here:")
 
+# get text from url
 privacy_policy_str = scrape_privacy_policy_url(privacy_policy_url)
 
 st.write('The url input is: ', privacy_policy_url)
 
-# st.write('Full Privacy Policy:', privacy_policy_str)
-
+# initial values before user inputs url
 if privacy_policy_url == '':
     reading_score = 'NA'
     word_total = 'NA'
@@ -60,12 +43,13 @@ else:
     word_total = word_count(privacy_policy_str)
     time_to_read = round(word_total/250)
 
+# metrics display
 col1, col2, col3 = st.columns(3)
 col1.metric("Reading Grade Level", reading_score)
 col2.metric("Total Length", str(word_total) + ' words')
 col3.metric("Estimated Time to Read", str(time_to_read) + ' minutes')
 
-
+# flags display
 st.text("🚩 - Risk #1")
 st.text("🚩 - Risk #2")
 st.text("🚩 - Risk #3")

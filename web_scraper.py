@@ -3,6 +3,12 @@ from bs4 import BeautifulSoup as soup
 
 
 def scrape_privacy_policy_url(url):
+    """
+
+    :param url: url of text
+    :returns: privacy policy text
+
+    """
 
     if url == '':
         return "No url input"
