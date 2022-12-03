@@ -8,6 +8,8 @@ st.set_page_config(
     page_icon="🎈",
 )
 
+st.image("img/privacy-dash-logo.png")
+
 # title and introductory text
 st.title('Privacy Policy Analyzer')
 
