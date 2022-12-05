@@ -1,8 +1,58 @@
 import random
 import streamlit as st
 import pandas as pd
-from web_scraper import scrape_privacy_policy_url
-from policy_scores import readability_score, word_count
+# from web_scraper import scrape_privacy_policy_url
+# from policy_scores import readability_score, word_count
+
+from urllib.request import Request, urlopen
+from bs4 import BeautifulSoup as soup
+
+from readability import Readability
+
+
+def readability_score(text):
+    """
+
+    :param text: privacy policy raw text
+    :returns: Flesch–Kincaid readability score
+
+    """
+    r = Readability(text)
+
+    return round(r.flesch_kincaid().score)
+
+
+def word_count(text):
+    """
+
+    :param text: privacy policy raw text
+    :returns: total number of words in text
+
+    """
+    return (len(text.strip().split(" ")))
+
+
+def scrape_privacy_policy_url(url):
+    """
+
+    :param url: url of text
+    :returns: privacy policy text
+
+    """
+
+    if url == '':
+        return "No url input"
+
+    req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+
+    webpage = urlopen(req).read()
+    page_soup = soup(webpage, "html.parser")
+
+    web_text = page_soup.find_all("p")
+    output = ' '.join([item.text for item in web_text])
+
+    return output
+
 
 st.set_page_config(
     page_title="Privacy Policy Analyzer",
