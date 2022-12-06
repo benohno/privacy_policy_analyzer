@@ -70,9 +70,4 @@ urllib3==1.26.12
 validators==0.20.0
 wsproto==1.2.0
 zipp==3.9.0
-transformers
-numpy
-pandas
-matplotlib
-scikit-learn
-tensorflow
+
