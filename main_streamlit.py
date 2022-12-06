@@ -1,6 +1,7 @@
 import random
 import streamlit as st
 import pandas as pd
+import nltk
 # from web_scraper import scrape_privacy_policy_url
 # from policy_scores import readability_score, word_count
 
@@ -8,6 +9,8 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup as soup
 
 from readability import Readability
+
+nltk.download('punkt')
 
 
 def readability_score(text):
