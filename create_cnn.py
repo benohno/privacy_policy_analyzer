@@ -1,5 +1,5 @@
+import tempfile
 import pandas as pd
-import matplolib as plt
 from sklearn.model_selection import train_test_split
 import transformers
 import tensorflow as tf
@@ -25,7 +25,7 @@ sample_idx = 23
 print(f'Sample: "{train_texts[sample_idx]}"')
 print(f"Labels: {pd.Series(train_labels[sample_idx], label_names).to_dict()}")
 
-
+BATCH_SIZE = 16
 MODEL_NAME = 'distilbert-base-uncased'
 MAX_LENGTH = 200  # We truncate anything after the 200-th word to speed up training
 
@@ -77,7 +77,6 @@ output = Dense(
 )(pooled_output)
 
 model = Model(inputs=inputs, outputs=output, name='BERT_MultiLabel')
-model.summary()
 
 
 def multi_label_accuracy(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
@@ -87,14 +86,14 @@ def multi_label_accuracy(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
     exact matches.
 
     :Example:
-    >>> from tensorflow.keras import metrics
-    >>> y_true = tf.convert_to_tensor([[1., 1.]])
-    >>> y_pred = tf.convert_to_tensor([[1., 0.]])
-    >>> metrics.Accuracy()(y_true, y_pred).numpy()
+        from tensorflow.keras import metrics
+        y_true = tf.convert_to_tensor([[1., 1.]])
+        y_pred = tf.convert_to_tensor([[1., 0.]])
+        metrics.Accuracy()(y_true, y_pred).numpy()
     0.5
-    >>> metrics.CategoricalAccuracy()(y_true, y_pred).numpy()
+        metrics.CategoricalAccuracy()(y_true, y_pred).numpy()
     1.0
-    >>> multi_label_accuracy(y_true, y_pred).numpy()
+        multi_label_accuracy(y_true, y_pred).numpy()
     0.0
     """
     y_pred = tf.math.round(y_pred)
@@ -106,24 +105,45 @@ def multi_label_accuracy(y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
 loss = BinaryCrossentropy()
 optimizer = Adam(5e-5)
 metrics = [
-    multi_label_accuracy,
     "binary_accuracy",
     AUC(name="average_precision", curve="PR", multi_label=True)
 ]
 
 model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 training_history = model.fit(
-    train_dataset.shuffle(1000).batch(16), epochs=2, batch_size=16,
-    validation_data=test_dataset.batch(16)
+    train_dataset.shuffle(1000).batch(BATCH_SIZE), epochs=2, batch_size=BATCH_SIZE,
+    validation_data=test_dataset.batch(BATCH_SIZE)
 )
 
-
 # evaluate the model
-benchmarks = model.evaluate(test_dataset.batch(16), return_dict=True, batch_size=16)
+benchmarks = model.evaluate(test_dataset.batch(BATCH_SIZE), return_dict=True, batch_size=BATCH_SIZE)
+predict = model.predict(test_dataset.batch(BATCH_SIZE), batch_size=BATCH_SIZE)
 
+print("benchmarks")
 print(benchmarks)
 
-loss, accuracy = model.evaluate(test_dataset.batch(16))
+print("predictions")
+print(predict)
 
-print("Loss: ", loss)
-print("Accuracy: ", accuracy)
+# loss, accuracy = model.evaluate(test_dataset.batch(BATCH_SIZE))
+
+# print("Loss: ", loss)
+# print("Accuracy: ", accuracy)
+
+
+#docs: https://www.tensorflow.org/text/tutorials/bert_glue
+# export the model
+saved_model_path = './model/policy_model.h5'
+# model.save_pretrained(saved_model_path)
+
+
+preprocess_inputs = model.inputs
+bert_encoder_inputs = model(preprocess_inputs)
+# bert_outputs = classifier_model(bert_encoder_inputs)
+
+print(model.summary())
+
+print('Saving', saved_model_path)
+
+# Save everything on the Colab host (even the variables from TPU memory)
+model.save(saved_model_path)

@@ -32,6 +32,7 @@ combined_csv = combined_csv.sort_values(by=['outcome', 'source', 'text']).reset_
 # then export to file
 
 classes = combined_csv['outcome'].unique()
+print(classes)
 os.makedirs('../train', exist_ok=True)
 # combined_csv.to_csv(f'../train/train_data.csv', index=False)
 """
@@ -65,6 +66,11 @@ pd.set_option('display.max_columns', None)
 combined_csv = encode_and_bind(combined_csv, 'outcome')
 os.chdir("../")
 os.makedirs('train_csv', exist_ok=True)
-combined_csv.to_csv('train_csv/policies_train.csv', index=False)
-df = pd.read_csv('train_csv/policies_train.csv')
+combined_csv_test = combined_csv.iloc[:20, :]
+combined_csv_train = combined_csv.iloc[20:, :]
+
+# save files
+combined_csv_test.to_csv('train_csv/policies_test.csv', index=False)
+combined_csv_train.to_csv('train_csv/policies_train.csv', index=False)
+df = pd.read_csv('train_csv/policies_test.csv')
 print(df.head(4))
